@@ -124,9 +124,44 @@ function queueIfNeeded(
 }
 
 function htmlMutationRunner(record: HTMLRecord) {
-  let val = record.originalValue;
-  record.mutations.forEach(m => (val = m.mutate(val)));
-  queueIfNeeded(getTransformedHTML(val), record);
+  let finalHtml = record.originalValue;
+  record.mutations.forEach(m => (finalHtml = m.mutate(finalHtml)));
+
+  const originalHtml = record.originalValue;
+
+  // Non-destructive append
+  if (finalHtml.startsWith(originalHtml)) {
+    const appendedHtml = finalHtml.substring(originalHtml.length);
+    if (!appendedHtml) return;
+
+    const temp = document.createElement('div');
+    temp.innerHTML = appendedHtml;
+    Array.from(temp.childNodes).forEach(node => {
+      record.el.appendChild(node);
+    });
+    record.virtualValue = record.el.innerHTML;
+    return;
+  }
+  // Non-destructive prepend
+  if (finalHtml.endsWith(originalHtml)) {
+    const prependedHtml =
+      finalHtml.substring(0, finalHtml.length - originalHtml.length);
+    if (!prependedHtml) return;
+      
+    const temp = document.createElement('div');
+    temp.innerHTML = prependedHtml;
+    const firstChild = record.el.firstChild;
+    Array.from(temp.childNodes)
+      .reverse()
+      .forEach(node => {
+        record.el.insertBefore(node, firstChild);
+      });
+    record.virtualValue = record.el.innerHTML;
+    return;
+  }
+
+  // Fallback to destructive innerHTML replacement
+  queueIfNeeded(getTransformedHTML(finalHtml), record);
 }
 function classMutationRunner(record: ClassnameRecord) {
   const val = new Set(record.originalValue.split(/\s+/).filter(Boolean));
@@ -550,7 +585,7 @@ export type MutationController = {
 export type DeclarativeMutation = {
   selector: string;
   attribute: string;
-  action: 'append' | 'set' | 'remove';
+  action: 'append' | 'set' | 'remove' | 'prepend';
   value?: string;
   parentSelector?: string;
   insertBeforeSelector?: string;
