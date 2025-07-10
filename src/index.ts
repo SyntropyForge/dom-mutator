@@ -144,10 +144,12 @@ function htmlMutationRunner(record: HTMLRecord) {
   }
   // Non-destructive prepend
   if (finalHtml.endsWith(originalHtml)) {
-    const prependedHtml =
-      finalHtml.substring(0, finalHtml.length - originalHtml.length);
+    const prependedHtml = finalHtml.substring(
+      0,
+      finalHtml.length - originalHtml.length
+    );
     if (!prependedHtml) return;
-      
+
     const temp = document.createElement('div');
     temp.innerHTML = prependedHtml;
     const firstChild = record.el.firstChild;
