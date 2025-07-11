@@ -1,9 +1,12 @@
 {
-  "version": "0.7.1",
+  "version": "0.7.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "engines": {
     "node": ">=10"
   },
@@ -28,8 +31,11 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "dom-mutator",
+  "name": "@syntropyforge/dom-mutator",
   "author": "Jeremy Dorn",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "module": "dist/dom-mutator.esm.js",
   "size-limit": [
     {
